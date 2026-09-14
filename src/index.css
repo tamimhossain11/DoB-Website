@@ -1,0 +1,208 @@
+@import "tailwindcss";
+
+@theme {
+  /* ---- Brand palette, sampled from the logo ---- */
+  --color-ink: #06170F;
+  --color-forest: #04241A;
+  --color-bottle: #023B29;
+  --color-flag: #006A4E;
+  --color-leaf: #00603C;
+  --color-mint: #7FD1AE;
+  --color-glow: #35E39B;
+
+  --color-crimson: #CC0024;
+  --color-vermilion: #E01A32;
+  --color-blush: #F4707F;
+
+  --color-paper: #F7F5EF;
+  --color-parchment: #EFEBE0;
+  --color-sand: #DED8C8;
+
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-bengali: "Noto Sans Bengali", "Hind Siliguri", "Inter", ui-sans-serif, sans-serif;
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: var(--color-flag);
+    color: var(--color-paper);
+  }
+
+  /* Slim, brand-tinted scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-parchment);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-flag);
+    border-radius: 999px;
+    border: 3px solid var(--color-parchment);
+  }
+}
+
+@layer utilities {
+  /* Eyebrow / kicker label used above section headings */
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+  }
+
+  .u-balance {
+    text-wrap: balance;
+  }
+
+  /* Paper grain — keeps the cream sections from reading as flat #fff */
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.4;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.38'/%3E%3C/svg%3E");
+  }
+
+  /* Hairline grid used behind dark sections */
+  .blueprint {
+    background-image:
+      linear-gradient(to right, rgba(127, 209, 174, 0.07) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(127, 209, 174, 0.07) 1px, transparent 1px);
+    background-size: 72px 72px;
+  }
+
+  .mask-fade-b {
+    mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+  }
+
+  .mask-fade-x {
+    mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+  }
+}
+
+/* ---------- Motion ---------- */
+
+@keyframes dob-rise {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes dob-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes dob-orbit {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes dob-sweep {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(220%);
+  }
+}
+
+@keyframes dob-twinkle {
+  0%,
+  100% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes dob-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+.animate-marquee {
+  animation: dob-marquee 42s linear infinite;
+}
+
+.animate-orbit {
+  animation: dob-orbit 34s linear infinite;
+}
+
+.animate-sweep {
+  animation: dob-sweep 5.5s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: dob-float 7s ease-in-out infinite;
+}
+
+/* Scroll reveal — elements start hidden, .is-visible is added by IntersectionObserver */
+.reveal {
+  opacity: 0;
+}
+
+.reveal.is-visible {
+  animation: dob-rise 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal {
+    opacity: 1;
+    animation: none !important;
+  }
+  .animate-marquee,
+  .animate-orbit,
+  .animate-sweep,
+  .animate-float {
+    animation: none !important;
+  }
+}
