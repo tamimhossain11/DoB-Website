@@ -1,5 +1,5 @@
 import { pressRelease as pr } from '../data/press'
-import { site } from '../data/content'
+import { facebook, site } from '../data/content'
 import { Kicker, Reveal } from './ui'
 import DocumentViewer from './DocumentViewer'
 
@@ -87,6 +87,46 @@ export default function PressRelease() {
                   </svg>
                 </a>
               </div>
+            </Reveal>
+
+            {/* ── Official Facebook page ── */}
+            <Reveal delay={300}>
+              <a
+                href={facebook.href}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="group mt-6 flex items-center gap-4 rounded-2xl border border-[#1877F2]/25 bg-[#1877F2]/8 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-[#1877F2]/50 hover:bg-[#1877F2]/12 sm:p-5"
+              >
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#1877F2] text-white transition-transform duration-300 group-hover:scale-105">
+                  <svg viewBox="0 0 24 24" className="h-6 w-6" fill="currentColor" aria-hidden="true">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                  </svg>
+                </span>
+
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-semibold text-ink">
+                    Follow Dreams of Bangladesh on Facebook
+                  </span>
+                  <span className="mt-0.5 block truncate font-mono text-xs text-[#1877F2]">
+                    {facebook.handle}
+                  </span>
+                </span>
+
+                <svg
+                  viewBox="0 0 16 16"
+                  className="h-4 w-4 shrink-0 text-[#1877F2] transition-transform duration-300 group-hover:translate-x-1"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M2 8h11M9 4l4 4-4 4"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </a>
             </Reveal>
           </div>
         </div>
@@ -195,6 +235,29 @@ export default function PressRelease() {
                 <div className="flex gap-3">
                   <dt className="w-16 shrink-0 text-mint/50">Office</dt>
                   <dd className="text-paper/70">{pr.contact.address}</dd>
+                </div>
+                <div className="flex gap-3">
+                  <dt className="w-16 shrink-0 text-mint/50">Facebook</dt>
+                  <dd className="min-w-0">
+                    <a
+                      href={facebook.href}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="inline-flex items-center gap-1.5 break-all font-mono text-mint hover:text-paper"
+                    >
+                      {facebook.handle}
+                      <svg viewBox="0 0 12 12" className="h-2.5 w-2.5 shrink-0" aria-hidden="true">
+                        <path
+                          d="M3 9L9 3M4 3h5v5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </a>
+                  </dd>
                 </div>
               </dl>
             </div>

@@ -252,8 +252,15 @@ export const join = {
   cta: { label: 'Write to us', href: 'mailto:dreamsofbangladesh@gmail.com' },
 }
 
+/** Official Facebook page — the team's main public channel. */
+export const facebook = {
+  label: 'Facebook',
+  handle: '@dreamsofbangladeshoffcial',
+  href: 'https://www.facebook.com/dreamsofbangladeshoffcial',
+}
+
 export const socials = [
-  { label: 'Facebook', href: 'https://www.facebook.com/dreamsofbangladesh' }, // VERIFY
+  { label: facebook.label, href: facebook.href },
   { label: 'LinkedIn', href: '#' }, // VERIFY
   { label: 'Instagram', href: '#' }, // VERIFY
   { label: 'YouTube', href: '#' }, // VERIFY
