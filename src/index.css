@@ -2,26 +2,30 @@
 
 @theme {
   /* ---- Brand palette, sampled from the logo ---- */
-  --color-ink: #06170F;
-  --color-forest: #04241A;
-  --color-bottle: #023B29;
-  --color-flag: #006A4E;
-  --color-leaf: #00603C;
-  --color-mint: #7FD1AE;
+  --color-ink: #0B1A13;        /* body text, darkest ground */
+  --color-forest: #062118;     /* dark sections */
+  --color-bottle: #0B2E22;     /* raised surface on dark */
+  --color-flag: #006A4E;       /* primary green */
+  --color-leaf: #00563F;       /* green, hover */
+  --color-mint: #8FD3B6;       /* green on dark */
   --color-glow: #35E39B;
 
-  --color-crimson: #CC0024;
+  --color-crimson: #C8102E;    /* flag red */
   --color-vermilion: #E01A32;
   --color-blush: #F4707F;
 
-  --color-paper: #F7F5EF;
-  --color-parchment: #EFEBE0;
-  --color-sand: #DED8C8;
+  --color-paper: #F6F5F1;      /* page */
+  --color-surface: #FFFFFF;    /* cards, panels */
+  --color-parchment: #EDEBE4;  /* alternate section */
+  --color-sand: #DCD8CC;
 
-  --font-display: "Fraunces", ui-serif, Georgia, serif;
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
-  --font-bengali: "Noto Sans Bengali", "Hind Siliguri", "Inter", ui-sans-serif, sans-serif;
+  /* ---- Type: formal serif headlines, Plex for text, UI and figures ---- */
+  --font-display: "Source Serif 4", "Source Serif Pro", Georgia, serif;
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --font-bengali: "Noto Sans Bengali", "Hind Siliguri", "IBM Plex Sans", ui-sans-serif, sans-serif;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @layer base {
@@ -36,14 +40,19 @@
 
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 5rem;
+    scroll-padding-top: 5.5rem;
   }
 
   body {
     background-color: var(--color-paper);
     color: var(--color-ink);
     font-family: var(--font-sans);
+    font-feature-settings: "ss02";
     overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4 {
+    font-optical-sizing: auto;
   }
 
   ::selection {
@@ -51,26 +60,41 @@
     color: var(--color-paper);
   }
 
-  /* Slim, brand-tinted scrollbar */
+  :focus-visible {
+    outline: 2px solid var(--color-flag);
+    outline-offset: 2px;
+  }
+
   ::-webkit-scrollbar {
     width: 10px;
+    height: 10px;
   }
   ::-webkit-scrollbar-track {
-    background: var(--color-parchment);
+    background: var(--color-paper);
   }
   ::-webkit-scrollbar-thumb {
-    background: var(--color-flag);
+    background: #c9c6bb;
     border-radius: 999px;
-    border: 3px solid var(--color-parchment);
+    border: 3px solid var(--color-paper);
   }
 }
 
 @layer utilities {
-  /* Eyebrow / kicker label used above section headings */
+  /* Small uppercase label set in mono — section indexes, table heads, metadata */
+  .label {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  /* Kept for older markup; same as .label */
   .kicker {
     font-family: var(--font-mono);
     font-size: 0.6875rem;
-    letter-spacing: 0.28em;
+    font-weight: 500;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
   }
 
@@ -78,131 +102,39 @@
     text-wrap: balance;
   }
 
-  /* Paper grain — keeps the cream sections from reading as flat #fff */
-  .grain::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.4;
-    mix-blend-mode: multiply;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.38'/%3E%3C/svg%3E");
+  .u-pretty {
+    text-wrap: pretty;
   }
 
-  /* Hairline grid used behind dark sections */
-  .blueprint {
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Fine engineering grid for dark panels */
+  .grid-lines {
     background-image:
-      linear-gradient(to right, rgba(127, 209, 174, 0.07) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(127, 209, 174, 0.07) 1px, transparent 1px);
-    background-size: 72px 72px;
+      linear-gradient(to right, rgba(143, 211, 182, 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(143, 211, 182, 0.06) 1px, transparent 1px);
+    background-size: 32px 32px;
   }
 
-  .mask-fade-b {
-    mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+  .grid-lines-light {
+    background-image:
+      linear-gradient(to right, rgba(11, 26, 19, 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(11, 26, 19, 0.045) 1px, transparent 1px);
+    background-size: 40px 40px;
   }
 
-  .mask-fade-x {
-    mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+  .scrollbar-none {
+    scrollbar-width: none;
   }
-}
-
-/* ---------- Motion ---------- */
-
-@keyframes dob-rise {
-  from {
-    opacity: 0;
-    transform: translateY(26px);
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
   }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-@keyframes dob-marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-@keyframes dob-orbit {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes dob-sweep {
-  0% {
-    transform: translateX(-120%);
-  }
-  100% {
-    transform: translateX(220%);
-  }
-}
-
-@keyframes dob-twinkle {
-  0%,
-  100% {
-    opacity: 0.15;
-  }
-  50% {
-    opacity: 0.9;
-  }
-}
-
-@keyframes dob-float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-14px);
-  }
-}
-
-.animate-marquee {
-  animation: dob-marquee 42s linear infinite;
-}
-
-.animate-orbit {
-  animation: dob-orbit 34s linear infinite;
-}
-
-.animate-sweep {
-  animation: dob-sweep 5.5s ease-in-out infinite;
-}
-
-.animate-float {
-  animation: dob-float 7s ease-in-out infinite;
-}
-
-/* Scroll reveal — elements start hidden, .is-visible is added by IntersectionObserver */
-.reveal {
-  opacity: 0;
-}
-
-.reveal.is-visible {
-  animation: dob-rise 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
-  }
-  .reveal {
-    opacity: 1;
-    animation: none !important;
-  }
-  .animate-marquee,
-  .animate-orbit,
-  .animate-sweep,
-  .animate-float {
-    animation: none !important;
   }
 }

@@ -1,5 +1,8 @@
+import { Check, ClipboardList, CodeXml, Cog, Mail, Zap } from 'lucide-react'
 import { divisions, join, team } from '../data/content'
-import { Button, Kicker, Reveal, Section } from './ui'
+import { Button, Reveal, Section, SectionHeader, Stagger, StaggerItem } from './ui'
+
+const DIVISION_ICONS = { Mechanical: Cog, Electrical: Zap, 'Software & Autonomy': CodeXml, Operations: ClipboardList }
 
 const initials = (name) =>
   name
@@ -12,147 +15,91 @@ const initials = (name) =>
 
 export default function Team() {
   return (
-    <Section id="team" tone="paper">
-      <div className="max-w-2xl">
-        <Reveal>
-          <Kicker>The team</Kicker>
-        </Reveal>
-        <Reveal delay={80}>
-          <h2 className="mt-6 font-display text-[clamp(2rem,4.2vw,3.25rem)] font-light leading-[1.05] tracking-[-0.03em] text-ink u-balance">
-            Four divisions.{' '}
-            <span className="italic font-normal text-flag">One machine</span> at the end of it.
-          </h2>
-        </Reveal>
-      </div>
+    <Section id="team" tone="surface">
+      <SectionHeader
+        index="04"
+        label="The team"
+        title="Four divisions. One machine at the end of it."
+        intro="Every member belongs to a division, and every division answers to the same integration schedule."
+      />
 
       {/* Divisions */}
-      <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {divisions.map((d, i) => (
-          <Reveal
-            key={d.name}
-            delay={i * 90}
-            className="group relative flex flex-col overflow-hidden rounded-2xl border border-ink/10 bg-parchment/60 p-7 transition-all duration-500 hover:-translate-y-1 hover:border-flag/30 hover:bg-paper hover:shadow-[0_24px_60px_-30px_rgba(6,23,15,0.35)]"
-          >
-            <span className="absolute right-6 top-6 font-mono text-xs text-ink/20">
-              {String(i + 1).padStart(2, '0')}
-            </span>
+      <Stagger className="mt-16 grid gap-px overflow-hidden rounded-lg border border-ink/10 bg-ink/10 sm:grid-cols-2 lg:grid-cols-4">
+        {divisions.map((d) => {
+          const Icon = DIVISION_ICONS[d.name] ?? Cog
+          return (
+            <StaggerItem key={d.name} className="flex flex-col bg-surface p-7">
+              <Icon className="h-6 w-6 text-flag" strokeWidth={1.5} aria-hidden="true" />
+              <h3 className="mt-6 font-display text-xl text-ink">{d.name}</h3>
+              <p className="mt-3 flex-1 text-[0.9375rem] leading-relaxed text-ink/60">{d.body}</p>
+              <ul className="mt-6 flex flex-wrap gap-1.5">
+                {d.tags.map((t) => (
+                  <li key={t} className="rounded border border-ink/12 px-2 py-0.5 font-mono text-[0.6875rem] text-ink/55">
+                    {t}
+                  </li>
+                ))}
+              </ul>
+            </StaggerItem>
+          )
+        })}
+      </Stagger>
 
-            <h3 className="font-display text-xl font-normal leading-snug text-ink">{d.name}</h3>
-            <p className="mt-3 flex-1 text-sm leading-relaxed text-ink/60">{d.body}</p>
+      {/* Leadership */}
+      <div className="mt-24 grid gap-12 lg:grid-cols-12 lg:gap-12">
+        <Reveal className="lg:col-span-4">
+          <p className="label text-flag">Leadership</p>
+          <p className="mt-5 max-w-md text-[1.0625rem] leading-[1.75] text-ink/70">
+            The team is run by its members. Leads are chosen on what they have shipped, and every lead trains a
+            successor before they hand the role on.
+          </p>
+        </Reveal>
 
-            <ul className="mt-6 flex flex-wrap gap-1.5">
-              {d.tags.map((t) => (
-                <li
-                  key={t}
-                  className="rounded-full border border-ink/12 px-2.5 py-1 font-mono text-[0.6875rem] text-ink/55 transition-colors duration-300 group-hover:border-flag/25 group-hover:text-flag"
-                >
-                  {t}
-                </li>
-              ))}
-            </ul>
-
-            <span className="absolute inset-x-0 bottom-0 h-0.5 origin-left scale-x-0 bg-gradient-to-r from-flag to-vermilion transition-transform duration-500 group-hover:scale-x-100" />
-          </Reveal>
-        ))}
-      </div>
-
-      {/* Roster */}
-      <div className="mt-20 grid gap-14 lg:grid-cols-[1fr_1.15fr] lg:gap-20">
-        <div>
-          <Reveal>
-            <Kicker>Leadership</Kicker>
-            <p className="mt-5 max-w-md text-[1.0625rem] leading-[1.75] text-ink/70">
-              The team is run by its members. Leads are chosen on what they have shipped, and every
-              lead trains a successor before they hand the role on.
-            </p>
-          </Reveal>
-
-          <Reveal delay={120}>
-            <div className="mt-8 rounded-2xl border border-dashed border-flag/25 bg-flag/4 p-5">
-              <p className="kicker text-flag/70">Editing note</p>
-              <p className="mt-2 text-sm leading-relaxed text-ink/60">
-                Replace the placeholder roster in{' '}
-                <code className="rounded bg-ink/8 px-1.5 py-0.5 font-mono text-[0.8125rem]">
-                  src/data/content.js
-                </code>{' '}
-                with real names, roles and photos.
-              </p>
-            </div>
-          </Reveal>
-        </div>
-
-        <div className="grid gap-px overflow-hidden rounded-2xl border border-ink/10 bg-ink/10 sm:grid-cols-2">
+        {/* Roster placeholder entries live in src/data/content.js — replace with real names, roles and photos. */}
+        <Stagger as="ul" className="grid border-t border-ink/10 sm:grid-cols-2 lg:col-span-8">
           {team.map((m, i) => (
-            <Reveal
+            <StaggerItem
+              as="li"
               key={m.name + i}
-              delay={i * 70}
-              className="group flex items-center gap-4 bg-paper p-5 transition-colors duration-400 hover:bg-parchment"
+              className={`flex items-center gap-4 border-b border-ink/10 py-5 ${i % 2 === 1 ? 'sm:border-l sm:pl-6' : 'sm:pr-6'}`}
             >
               {m.photo ? (
-                <img
-                  src={m.photo}
-                  alt={m.name}
-                  className="h-14 w-14 shrink-0 rounded-full object-cover"
-                />
+                <img src={m.photo} alt={m.name} className="h-12 w-12 shrink-0 rounded-full object-cover" />
               ) : (
-                <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-flag/20 bg-flag/8 font-display text-base text-flag transition-colors duration-400 group-hover:border-flag/40 group-hover:bg-flag group-hover:text-paper">
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-parchment font-display text-[0.9375rem] text-flag">
                   {initials(m.name)}
                 </span>
               )}
-
               <span className="min-w-0">
                 <span className="block truncate font-medium text-ink">{m.name}</span>
-                <span className="mt-0.5 block truncate text-[0.8125rem] text-ink/55">
-                  {m.role}
-                </span>
-                <span className="kicker mt-1.5 block text-ink/30">{m.division}</span>
+                <span className="mt-0.5 block truncate text-sm text-ink/55">{m.role}</span>
               </span>
-            </Reveal>
+              <span className="label ml-auto hidden shrink-0 text-ink/30 xl:block">{m.division}</span>
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
       </div>
 
       {/* Join */}
-      <div
-        id="join"
-        className="mt-24 grid gap-10 overflow-hidden rounded-3xl border border-ink/10 bg-parchment/70 p-8 sm:p-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16"
-      >
-        <Reveal>
-          <Kicker>{join.kicker}</Kicker>
-          <h3 className="mt-5 font-display text-[clamp(1.75rem,3.2vw,2.5rem)] font-light leading-[1.1] tracking-[-0.03em] text-ink u-balance">
-            We are looking for people who{' '}
-            <span className="italic font-normal text-vermilion">finish things</span>.
-          </h3>
-          <p className="mt-6 max-w-lg text-[1.0625rem] leading-[1.75] text-ink/70">{join.body}</p>
-          <div className="mt-9">
-            <Button href={join.cta.href}>{join.cta.label}</Button>
+      <Reveal id="join" className="mt-24 overflow-hidden rounded-lg bg-flag text-white">
+        <div className="grid lg:grid-cols-12">
+          <div className="p-8 sm:p-12 lg:col-span-7">
+            <p className="label text-white/70">{join.kicker}</p>
+            <h3 className="mt-5 font-display text-[clamp(1.85rem,3.2vw,2.6rem)] leading-[1.1] u-balance">{join.heading}</h3>
+            <p className="mt-6 max-w-lg text-[1.0625rem] leading-[1.75] text-white/80">{join.body}</p>
+            <Button href={join.cta.href} variant="light" icon={Mail} className="mt-9">
+              {join.cta.label}
+            </Button>
           </div>
-        </Reveal>
-
-        <Reveal delay={120}>
-          <ul className="space-y-4">
+          <ul className="border-t border-white/15 p-8 sm:p-12 lg:col-span-5 lg:border-l lg:border-t-0">
             {join.points.map((p) => (
-              <li key={p} className="flex items-start gap-3.5 border-b border-ink/8 pb-4">
-                <svg
-                  viewBox="0 0 16 16"
-                  className="mt-1 h-4 w-4 shrink-0 text-flag"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M3 8.5l3.2 3.2L13 5"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                <span className="text-[0.9375rem] leading-relaxed text-ink/70">{p}</span>
+              <li key={p} className="flex items-start gap-3.5 border-b border-white/15 py-4 first:pt-0 last:border-0 last:pb-0">
+                <Check className="mt-0.5 h-5 w-5 shrink-0 text-white" strokeWidth={1.75} aria-hidden="true" />
+                <span className="text-[0.9375rem] leading-relaxed text-white/85">{p}</span>
               </li>
             ))}
           </ul>
-        </Reveal>
-      </div>
+        </div>
+      </Reveal>
     </Section>
   )
 }

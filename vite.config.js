@@ -14,6 +14,8 @@ export default defineConfig({
         // is shareable and indexable without any SPA routing or host rewrites.
         main: here('index.html'),
         press: here('wice-press-release/index.html'),
+        board: here('board/index.html'),
+        signin: here('signin/index.html'),
       },
     },
   },

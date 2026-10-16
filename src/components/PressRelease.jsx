@@ -1,295 +1,203 @@
+import { ArrowLeft, ArrowUpRight, CalendarDays, Clock, Download, ExternalLink, Mail, MapPin, Phone, Quote } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { pressRelease as pr } from '../data/press'
 import { facebook, site } from '../data/content'
-import { Kicker, Reveal } from './ui'
+import { Container, EASE, Reveal, Stagger, StaggerItem } from './ui'
 import DocumentViewer from './DocumentViewer'
+
+const BRIEFING_ICONS = [MapPin, CalendarDays, Clock]
 
 export default function PressRelease() {
   return (
-    <article className="relative overflow-hidden bg-paper grain">
-      {/* Ambient wash, matched to the home hero */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -right-40 -top-40 h-[34rem] w-[34rem] rounded-full bg-flag/8 blur-3xl" />
-        <div className="absolute -left-40 top-[40rem] h-[26rem] w-[26rem] rounded-full bg-vermilion/6 blur-3xl" />
-      </div>
+    <article className="bg-paper pt-[4.5rem]">
+      {/* ── Masthead ── */}
+      <header className="border-b border-ink/10 bg-surface">
+        <Container className="py-14 sm:py-20">
+          <motion.div
+            className="flex flex-wrap items-center gap-x-4 gap-y-2"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <span className="label rounded-sm bg-crimson px-2 py-1 text-white">Press release</span>
+            <time dateTime={pr.isoDate} className="font-bengali text-sm text-ink/70">{pr.dateline}</time>
+            <span className="label text-ink/40">{pr.datelineEn}</span>
+          </motion.div>
 
-      <div className="relative z-10 mx-auto w-full max-w-6xl px-5 pb-24 pt-28 sm:px-8 sm:pt-32">
-        {/* ── Masthead: the document leads, metadata sits beside it ── */}
-        <Reveal>
-          <Kicker>{pr.kicker}</Kicker>
-        </Reveal>
+          <div className="mt-10 grid items-start gap-12 lg:grid-cols-12 lg:gap-14">
+            {/* The release itself — first on mobile, right on desktop */}
+            <motion.div
+              className="order-1 lg:order-2 lg:col-span-5"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: EASE, delay: 0.1 }}
+            >
+              <DocumentViewer />
+            </motion.div>
 
-        <div className="mt-7 grid items-start gap-10 lg:grid-cols-[1fr_0.88fr] lg:gap-14">
-          {/* The release itself — first thing on the page, and first on mobile */}
-          <Reveal delay={60} className="order-1 lg:order-2">
-            <DocumentViewer />
-          </Reveal>
-
-          <div className="order-2 min-w-0 lg:order-1">
-            <Reveal delay={120}>
-              <h1 className="font-bengali text-[clamp(1.25rem,2.1vw,1.7rem)] font-semibold leading-[1.6] tracking-tight text-ink u-balance">
+            <motion.div
+              className="order-2 min-w-0 lg:order-1 lg:col-span-7"
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: EASE, delay: 0.15 }}
+            >
+              <h1 className="font-bengali text-[clamp(1.35rem,2.2vw,1.85rem)] font-semibold leading-[1.6] text-ink u-balance">
                 {pr.headline}
               </h1>
-            </Reveal>
+              <p className="mt-6 border-l-2 border-flag pl-5 text-[1.0625rem] leading-relaxed text-ink/65">{pr.summaryEn}</p>
 
-            <Reveal delay={170}>
-              <p className="mt-6 border-l-2 border-flag/30 pl-5 text-[0.9375rem] leading-relaxed text-ink/60">
-                {pr.summaryEn}
-              </p>
-            </Reveal>
-
-            <Reveal delay={210}>
-              <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 border-y border-ink/10 py-4">
-                <time dateTime={pr.isoDate} className="font-bengali text-sm text-ink/70">
-                  {pr.dateline}
-                </time>
-                <span className="h-1 w-1 rounded-full bg-vermilion" />
-                <span className="kicker text-ink/40">{pr.datelineEn}</span>
-              </div>
-            </Reveal>
-
-            {/* ── Download actions ── */}
-            <Reveal delay={250}>
-              <div className="mt-7 flex flex-wrap gap-3">
+              <div className="mt-9 flex flex-wrap gap-3">
                 <a
                   href={pr.pdf.file}
                   download={pr.pdf.downloadName}
-                  className="group inline-flex items-center gap-2.5 rounded-full bg-flag px-6 py-3.5 text-sm font-medium text-paper shadow-[0_10px_30px_-12px_rgba(0,106,78,0.75)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-leaf"
+                  className="inline-flex items-center gap-2.5 rounded-md bg-flag px-5 py-3 text-[0.9375rem] font-medium text-white transition-colors hover:bg-leaf"
                 >
-                  <svg viewBox="0 0 16 16" className="h-4 w-4" aria-hidden="true">
-                    <path
-                      d="M8 1.5v9m0 0L4.5 7M8 10.5L11.5 7M2 13.5h12"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+                  <Download className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
                   Download the PDF
                 </a>
-
                 <a
                   href={pr.pdf.file}
                   target="_blank"
                   rel="noreferrer noopener"
-                  className="group inline-flex items-center gap-2.5 rounded-full border border-ink/20 px-6 py-3.5 text-sm font-medium text-ink transition-all duration-300 hover:-translate-y-0.5 hover:border-flag hover:text-flag"
+                  className="inline-flex items-center gap-2.5 rounded-md border border-ink/20 bg-surface px-5 py-3 text-[0.9375rem] font-medium text-ink transition-colors hover:border-ink/40"
                 >
+                  <ExternalLink className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
                   Open in a new tab
-                  <svg viewBox="0 0 12 12" className="h-3 w-3" aria-hidden="true">
-                    <path
-                      d="M3 9L9 3M4 3h5v5"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
                 </a>
               </div>
-            </Reveal>
 
-            {/* ── Official Facebook page ── */}
-            <Reveal delay={300}>
+              {/* Official Facebook page */}
               <a
                 href={facebook.href}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="group mt-6 flex items-center gap-4 rounded-2xl border border-[#1877F2]/25 bg-[#1877F2]/8 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-[#1877F2]/50 hover:bg-[#1877F2]/12 sm:p-5"
+                className="group mt-8 flex items-center gap-4 rounded-lg border border-ink/10 bg-paper p-4 transition-colors hover:border-[#1877F2]/40 sm:p-5"
               >
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#1877F2] text-white transition-transform duration-300 group-hover:scale-105">
-                  <svg viewBox="0 0 24 24" className="h-6 w-6" fill="currentColor" aria-hidden="true">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-[#1877F2] text-white">
+                  {/* Facebook's own mark — Lucide no longer ships brand logos */}
+                  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden="true">
                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                   </svg>
                 </span>
-
                 <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-semibold text-ink">
-                    Follow Dreams of Bangladesh on Facebook
-                  </span>
-                  <span className="mt-0.5 block truncate font-mono text-xs text-[#1877F2]">
-                    {facebook.handle}
-                  </span>
+                  <span className="block text-sm font-semibold text-ink">Official updates on Facebook</span>
+                  <span className="mt-0.5 block truncate font-mono text-xs text-ink/50">{facebook.handle}</span>
                 </span>
-
-                <svg
-                  viewBox="0 0 16 16"
-                  className="h-4 w-4 shrink-0 text-[#1877F2] transition-transform duration-300 group-hover:translate-x-1"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M2 8h11M9 4l4 4-4 4"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <ArrowUpRight className="h-5 w-5 shrink-0 text-ink/40 transition-colors group-hover:text-[#1877F2]" strokeWidth={1.5} aria-hidden="true" />
               </a>
-            </Reveal>
+            </motion.div>
           </div>
-        </div>
+        </Container>
+      </header>
 
-        {/* ── Key facts ── */}
-        <div className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-ink/10 bg-ink/10 sm:grid-cols-2 lg:grid-cols-4">
+      {/* ── Key facts ── */}
+      <Container>
+        <Stagger className="grid grid-cols-2 border-b border-ink/10 lg:grid-cols-4">
           {pr.facts.map((f, i) => (
-            <Reveal key={f.label} delay={i * 80} className="bg-paper p-6">
-              <p className="font-bengali text-3xl font-semibold leading-none text-flag">
-                {f.value}
-              </p>
-              <p className="kicker mt-3 text-vermilion/80">{f.valueEn}</p>
-              <p className="font-bengali mt-2 text-[0.8125rem] leading-relaxed text-ink/55">
-                {f.label}
-              </p>
-            </Reveal>
-          ))}
-        </div>
-
-        {/* ── Full text ── */}
-        <div className="mx-auto mt-4 w-full max-w-3xl">
-        <Reveal delay={100} className="mt-16">
-          <Kicker>সম্পূর্ণ বিবরণ · Full text</Kicker>
-        </Reveal>
-
-        <div className="mt-8 space-y-6">
-          {pr.body.map((p, i) => (
-            <Reveal key={i} delay={i * 60}>
-              <p className="font-bengali text-[1.0625rem] leading-[2] text-ink/75">{p}</p>
-            </Reveal>
-          ))}
-        </div>
-
-        {/* ── Quote ── */}
-        <Reveal delay={80} className="mt-12">
-          <p className="font-bengali text-[1.0625rem] font-semibold leading-[2] text-ink">
-            {pr.quote.intro}
-          </p>
-
-          <blockquote className="relative mt-6 overflow-hidden rounded-2xl border border-flag/20 bg-flag/5 p-7 sm:p-9">
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute -right-2 -top-8 font-display text-[9rem] leading-none text-flag/10"
+            <StaggerItem
+              key={f.label}
+              className={`py-8 pr-5 ${i % 2 === 1 ? 'border-l border-ink/10 pl-5' : ''} ${i >= 2 ? 'border-t border-ink/10 lg:border-t-0' : ''} ${
+                i > 0 ? 'lg:border-l lg:pl-6' : ''
+              }`}
             >
-              &rdquo;
-            </span>
-            <p className="font-bengali relative text-[1.0625rem] leading-[2] text-ink/80">
-              {pr.quote.text}
-            </p>
-            <footer className="relative mt-6 border-t border-flag/15 pt-5">
-              <p className="font-bengali font-semibold text-ink">{pr.quote.attribution}</p>
-              <p className="mt-1 text-sm text-ink/55">{pr.quote.role}</p>
-            </footer>
-          </blockquote>
-        </Reveal>
+              <p className="font-bengali text-3xl font-semibold leading-none text-flag">{f.value}</p>
+              <p className="label mt-3 text-crimson/80">{f.valueEn}</p>
+              <p className="font-bengali mt-2 text-[0.8125rem] leading-relaxed text-ink/55">{f.label}</p>
+            </StaggerItem>
+          ))}
+        </Stagger>
+      </Container>
 
-        <Reveal delay={80}>
-          <p className="font-bengali mt-10 text-[1.0625rem] leading-[2] text-ink/75">{pr.closing}</p>
-        </Reveal>
-
-        {/* ── Briefing + contact ── */}
-        <div className="mt-16 grid gap-5 sm:grid-cols-2">
-          <Reveal className="rounded-2xl border border-ink/10 bg-parchment/60 p-7">
-            <h2 className="font-bengali text-lg font-semibold text-ink">{pr.briefing.title}</h2>
-            <dl className="mt-5 space-y-4">
-              {pr.briefing.rows.map(([k, v]) => (
-                <div key={k} className="border-b border-ink/8 pb-4 last:border-0 last:pb-0">
-                  <dt className="font-bengali text-sm text-flag">{k}</dt>
-                  <dd className="font-bengali mt-1.5 leading-relaxed text-ink/75">{v}</dd>
-                </div>
-              ))}
-            </dl>
+      {/* ── Full text ── */}
+      <Container className="py-20">
+        <div className="mx-auto max-w-3xl">
+          <Reveal>
+            <p className="label text-flag">সম্পূর্ণ বিবরণ · Full text</p>
           </Reveal>
 
-          <Reveal
-            delay={90}
-            className="relative overflow-hidden rounded-2xl border border-mint/15 bg-forest p-7 text-paper"
-          >
-            <div className="blueprint pointer-events-none absolute inset-0 opacity-60" />
-            <div className="relative">
-              <h2 className="kicker text-mint/60">{pr.contact.title}</h2>
+          <div className="mt-8 space-y-6">
+            {pr.body.map((p, i) => (
+              <Reveal key={i} delay={i * 50}>
+                <p className="font-bengali text-[1.0625rem] leading-[2] text-ink/80">{p}</p>
+              </Reveal>
+            ))}
+          </div>
 
+          <Reveal className="mt-12">
+            <p className="font-bengali text-[1.0625rem] font-semibold leading-[2] text-ink">{pr.quote.intro}</p>
+            <blockquote className="mt-5 rounded-lg border-l-4 border-flag bg-surface p-7 sm:p-9">
+              <Quote className="h-6 w-6 text-flag/40" strokeWidth={1.5} aria-hidden="true" />
+              <p className="font-bengali mt-4 text-[1.0625rem] leading-[2] text-ink/85">{pr.quote.text}</p>
+              <footer className="mt-6 border-t border-ink/10 pt-5">
+                <p className="font-bengali font-semibold text-ink">{pr.quote.attribution}</p>
+                <p className="mt-1 text-sm text-ink/55">{pr.quote.role}</p>
+              </footer>
+            </blockquote>
+          </Reveal>
+
+          <Reveal>
+            <p className="font-bengali mt-10 text-[1.0625rem] leading-[2] text-ink/80">{pr.closing}</p>
+          </Reveal>
+
+          {/* ── Briefing + contact ── */}
+          <div className="mt-16 grid gap-4 sm:grid-cols-2">
+            <Reveal className="rounded-lg border border-ink/10 bg-surface p-7">
+              <h2 className="font-bengali text-lg font-semibold text-ink">{pr.briefing.title}</h2>
+              <dl className="mt-5 space-y-4">
+                {pr.briefing.rows.map(([k, v], i) => {
+                  const Icon = BRIEFING_ICONS[i] ?? MapPin
+                  return (
+                    <div key={k} className="flex gap-3 border-b border-ink/8 pb-4 last:border-0 last:pb-0">
+                      <Icon className="mt-1 h-4 w-4 shrink-0 text-flag" strokeWidth={1.5} aria-hidden="true" />
+                      <div>
+                        <dt className="font-bengali text-sm text-flag">{k}</dt>
+                        <dd className="font-bengali mt-1 leading-relaxed text-ink/75">{v}</dd>
+                      </div>
+                    </div>
+                  )
+                })}
+              </dl>
+            </Reveal>
+
+            <Reveal delay={80} className="rounded-lg bg-forest p-7 text-paper">
+              <h2 className="label text-mint/60">{pr.contact.title}</h2>
               <p className="font-bengali mt-5 text-xl font-semibold">{pr.contact.name}</p>
               <p className="mt-1 text-sm text-paper/60">{pr.contact.role}</p>
+              <ul className="mt-6 space-y-3 text-sm">
+                <li>
+                  <a href={pr.contact.phoneHref} className="flex items-center gap-3 font-mono text-mint hover:text-paper">
+                    <Phone className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden="true" />
+                    {pr.contact.phone}
+                  </a>
+                </li>
+                <li>
+                  <a href={`mailto:${pr.contact.email}`} className="flex items-center gap-3 break-all font-mono text-mint hover:text-paper">
+                    <Mail className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden="true" />
+                    {pr.contact.email}
+                  </a>
+                </li>
+                <li className="flex items-start gap-3 text-paper/70">
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-mint" strokeWidth={1.5} aria-hidden="true" />
+                  {pr.contact.address}
+                </li>
+                <li>
+                  <a href={facebook.href} target="_blank" rel="noreferrer noopener" className="flex items-center gap-3 break-all font-mono text-mint hover:text-paper">
+                    <ArrowUpRight className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden="true" />
+                    {facebook.handle}
+                  </a>
+                </li>
+              </ul>
+            </Reveal>
+          </div>
 
-              <dl className="mt-6 space-y-3 text-sm">
-                <div className="flex gap-3">
-                  <dt className="w-16 shrink-0 text-mint/50">Phone</dt>
-                  <dd>
-                    <a href={pr.contact.phoneHref} className="font-mono text-mint hover:text-paper">
-                      {pr.contact.phone}
-                    </a>
-                  </dd>
-                </div>
-                <div className="flex gap-3">
-                  <dt className="w-16 shrink-0 text-mint/50">Email</dt>
-                  <dd className="min-w-0">
-                    <a
-                      href={`mailto:${pr.contact.email}`}
-                      className="break-all font-mono text-mint hover:text-paper"
-                    >
-                      {pr.contact.email}
-                    </a>
-                  </dd>
-                </div>
-                <div className="flex gap-3">
-                  <dt className="w-16 shrink-0 text-mint/50">Office</dt>
-                  <dd className="text-paper/70">{pr.contact.address}</dd>
-                </div>
-                <div className="flex gap-3">
-                  <dt className="w-16 shrink-0 text-mint/50">Facebook</dt>
-                  <dd className="min-w-0">
-                    <a
-                      href={facebook.href}
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      className="inline-flex items-center gap-1.5 break-all font-mono text-mint hover:text-paper"
-                    >
-                      {facebook.handle}
-                      <svg viewBox="0 0 12 12" className="h-2.5 w-2.5 shrink-0" aria-hidden="true">
-                        <path
-                          d="M3 9L9 3M4 3h5v5"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </a>
-                  </dd>
-                </div>
-              </dl>
-            </div>
+          <Reveal className="mt-16 border-t border-ink/10 pt-8">
+            <a href="/" className="group inline-flex items-center gap-2.5 text-sm text-ink/60 transition-colors hover:text-flag">
+              <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" strokeWidth={1.75} aria-hidden="true" />
+              Back to {site.name}
+            </a>
           </Reveal>
         </div>
-
-        </div>
-
-        {/* ── Back ── */}
-        <Reveal delay={80} className="mt-16 border-t border-ink/10 pt-8">
-          <a
-            href="/"
-            className="group inline-flex items-center gap-2.5 text-sm text-ink/60 transition-colors hover:text-flag"
-          >
-            <svg
-              viewBox="0 0 16 16"
-              className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-x-1"
-              aria-hidden="true"
-            >
-              <path
-                d="M14 8H3m4 4L3 8l4-4"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            Back to {site.name}
-          </a>
-        </Reveal>
-      </div>
+      </Container>
     </article>
   )
 }

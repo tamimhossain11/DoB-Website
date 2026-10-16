@@ -1,3 +1,4 @@
+import { ExternalLink, FileText } from 'lucide-react'
 import { pressRelease as pr } from '../data/press'
 
 /**
@@ -17,7 +18,7 @@ export default function DocumentViewer({ className = '' }) {
         href={pr.pdf.file}
         target="_blank"
         rel="noreferrer noopener"
-        className="relative block overflow-hidden rounded-2xl border border-ink/12 bg-white shadow-[0_30px_70px_-30px_rgba(6,23,15,0.45)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_40px_90px_-30px_rgba(6,23,15,0.55)]"
+        className="relative block overflow-hidden rounded-md border border-ink/15 bg-white shadow-[0_24px_50px_-28px_rgba(11,26,19,0.45)] transition-shadow duration-300 hover:shadow-[0_30px_60px_-26px_rgba(11,26,19,0.55)]"
         aria-label="Open the press release PDF in a new tab"
       >
         <img
@@ -27,44 +28,27 @@ export default function DocumentViewer({ className = '' }) {
           width="1100"
           height="1556"
         />
-
-        {/* Hover/focus affordance */}
-        <span className="pointer-events-none absolute inset-0 flex items-end justify-center bg-gradient-to-t from-ink/55 via-transparent to-transparent p-5 opacity-0 transition-opacity duration-400 group-hover:opacity-100 group-focus-within:opacity-100">
-          <span className="inline-flex items-center gap-2 rounded-full bg-paper px-5 py-2.5 text-sm font-medium text-ink shadow-lg">
+        <span className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center bg-gradient-to-t from-ink/50 to-transparent p-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100">
+          <span className="inline-flex items-center gap-2 rounded-md bg-white px-4 py-2 text-sm font-medium text-ink shadow">
+            <ExternalLink className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
             Open the full PDF
-            <svg viewBox="0 0 12 12" className="h-3 w-3" aria-hidden="true">
-              <path
-                d="M3 9L9 3M4 3h5v5"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
           </span>
         </span>
       </a>
 
       <figcaption className="mt-3 flex flex-wrap items-center justify-between gap-2">
-        <span className="kicker text-ink/35">{pr.pdf.sizeLabel}</span>
+        <span className="label inline-flex items-center gap-2 text-ink/40">
+          <FileText className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden="true" />
+          {pr.pdf.sizeLabel}
+        </span>
         <a
           href={pr.pdf.file}
           target="_blank"
           rel="noreferrer noopener"
-          className="inline-flex items-center gap-1.5 text-xs text-ink/50 transition-colors hover:text-flag"
+          className="inline-flex items-center gap-1.5 text-xs text-ink/55 transition-colors hover:text-flag"
         >
           Open full size
-          <svg viewBox="0 0 12 12" className="h-2.5 w-2.5" aria-hidden="true">
-            <path
-              d="M3 9L9 3M4 3h5v5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          <ExternalLink className="h-3 w-3" strokeWidth={1.75} aria-hidden="true" />
         </a>
       </figcaption>
     </figure>

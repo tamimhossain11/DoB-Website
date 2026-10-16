@@ -1,33 +1,23 @@
-import { useEffect, useRef, useState } from 'react'
+import { motion, MotionConfig } from 'framer-motion'
+import { ArrowRight } from 'lucide-react'
 
-/** Adds `.is-visible` once the element scrolls into view (one-shot). */
-export function Reveal({ children, delay = 0, as: Tag = 'div', className = '', ...rest }) {
-  const ref = useRef(null)
-  const [shown, setShown] = useState(false)
+export const EASE = [0.16, 1, 0.3, 1]
 
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    if (typeof IntersectionObserver === 'undefined') return setShown(true)
+/** Wrap each page once. Honours the visitor's "reduce motion" setting everywhere. */
+export function MotionRoot({ children }) {
+  return <MotionConfig reducedMotion="user">{children}</MotionConfig>
+}
 
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setShown(true)
-          io.disconnect()
-        }
-      },
-      { threshold: 0.12, rootMargin: '0px 0px -80px 0px' },
-    )
-    io.observe(el)
-    return () => io.disconnect()
-  }, [])
-
+/** Fades content up as it scrolls into view (once). `delay` is in milliseconds. */
+export function Reveal({ children, delay = 0, as = 'div', y = 18, className = '', ...rest }) {
+  const Tag = motion[as]
   return (
     <Tag
-      ref={ref}
-      className={`reveal ${shown ? 'is-visible' : ''} ${className}`}
-      style={{ animationDelay: `${delay}ms` }}
+      initial={{ opacity: 0, y }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '0px 0px -60px 0px' }}
+      transition={{ duration: 0.7, ease: EASE, delay: delay / 1000 }}
+      className={className}
       {...rest}
     >
       {children}
@@ -35,89 +25,114 @@ export function Reveal({ children, delay = 0, as: Tag = 'div', className = '', .
   )
 }
 
-/** Small monospaced label with a rule — used above every section heading. */
-export function Kicker({ children, tone = 'dark' }) {
-  const color = tone === 'light' ? 'text-mint' : 'text-flag'
-  const rule = tone === 'light' ? 'bg-mint/40' : 'bg-flag/30'
-  return (
-    <div className={`kicker flex items-center gap-3 ${color}`}>
-      <span className={`h-px w-8 ${rule}`} />
-      {children}
-    </div>
-  )
-}
-
-/** Display heading. Words wrapped in *asterisks* render in italic serif accent. */
-export function Heading({ children, className = '', level: Tag = 'h2' }) {
+/** Parent for staggered children: wrap items in <StaggerItem>. */
+export function Stagger({ children, as = 'div', gap = 0.07, className = '', ...rest }) {
+  const Tag = motion[as]
   return (
     <Tag
-      className={`font-display font-light tracking-[-0.02em] u-balance ${className}`}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, margin: '0px 0px -60px 0px' }}
+      variants={{ hidden: {}, show: { transition: { staggerChildren: gap } } }}
+      className={className}
+      {...rest}
     >
       {children}
     </Tag>
   )
 }
 
-/** Italic accent span for inside headings. */
-export function Accent({ children, tone = 'flag' }) {
-  const color = tone === 'crimson' ? 'text-vermilion' : tone === 'mint' ? 'text-mint' : 'text-flag'
-  return <em className={`italic font-normal ${color}`}>{children}</em>
-}
-
-/** Primary / secondary button — renders as an anchor. */
-export function Button({ href, children, variant = 'solid', className = '', ...rest }) {
-  const base =
-    'group relative inline-flex items-center gap-2.5 overflow-hidden rounded-full px-7 py-3.5 text-sm font-medium transition-all duration-300'
-
-  const styles = {
-    solid: 'bg-flag text-paper hover:bg-leaf shadow-[0_10px_30px_-12px_rgba(0,106,78,0.75)] hover:shadow-[0_16px_40px_-12px_rgba(0,106,78,0.85)] hover:-translate-y-0.5',
-    outline:
-      'border border-ink/20 text-ink hover:border-flag hover:text-flag hover:-translate-y-0.5',
-    light:
-      'border border-mint/30 text-paper hover:border-mint hover:bg-mint/10 hover:-translate-y-0.5',
-  }
-
+export function StaggerItem({ children, as = 'div', className = '', ...rest }) {
+  const Tag = motion[as]
   return (
-    <a href={href} className={`${base} ${styles[variant]} ${className}`} {...rest}>
-      <span className="relative z-10">{children}</span>
-      <Arrow />
-    </a>
-  )
-}
-
-function Arrow() {
-  return (
-    <svg
-      viewBox="0 0 16 16"
-      aria-hidden="true"
-      className="relative z-10 h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1"
+    <Tag
+      variants={{
+        hidden: { opacity: 0, y: 16 },
+        show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
+      }}
+      className={className}
+      {...rest}
     >
-      <path
-        d="M2 8h11M9 4l4 4-4 4"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
+      {children}
+    </Tag>
   )
 }
 
-/** Section shell with consistent rhythm and gutters. */
-export function Section({ id, children, className = '', tone = 'paper' }) {
-  const tones = {
-    paper: 'bg-paper text-ink grain',
-    parchment: 'bg-parchment text-ink grain',
-    forest: 'bg-forest text-paper',
-    ink: 'bg-ink text-paper',
-  }
+export function Container({ children, className = '' }) {
+  return <div className={`mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12 ${className}`}>{children}</div>
+}
+
+const TONES = {
+  paper: 'bg-paper text-ink',
+  surface: 'bg-surface text-ink',
+  parchment: 'bg-parchment text-ink',
+  forest: 'bg-forest text-paper',
+  ink: 'bg-ink text-paper',
+}
+
+/** Page section with consistent vertical rhythm. */
+export function Section({ id, children, className = '', tone = 'paper', bordered = true }) {
   return (
     <section
       id={id}
-      className={`relative overflow-hidden px-5 py-24 sm:px-8 md:py-32 lg:px-12 ${tones[tone]} ${className}`}
+      className={`relative py-24 md:py-32 ${TONES[tone]} ${bordered && (tone === 'paper' || tone === 'surface') ? 'border-t border-ink/10' : ''} ${className}`}
     >
-      <div className="relative z-10 mx-auto w-full max-w-7xl">{children}</div>
+      <Container>{children}</Container>
     </section>
+  )
+}
+
+/**
+ * Report-style section heading: a numbered index on the left, the headline on the
+ * right. `dark` switches colours for forest/ink sections.
+ */
+export function SectionHeader({ index, label, title, intro, dark = false, className = '', children }) {
+  return (
+    <div className={`grid gap-6 lg:grid-cols-12 lg:gap-12 ${className}`}>
+      <Reveal className="lg:col-span-3">
+        <p className={`label flex items-center gap-3 ${dark ? 'text-mint/70' : 'text-flag'}`}>
+          <span className="tabular">{index}</span>
+          <span className={`h-px w-6 ${dark ? 'bg-mint/30' : 'bg-flag/30'}`} />
+          <span>{label}</span>
+        </p>
+      </Reveal>
+      <div className="lg:col-span-9">
+        <Reveal delay={60}>
+          <h2 className={`font-display text-[clamp(2rem,3.6vw,3rem)] font-normal leading-[1.08] tracking-[-0.015em] u-balance ${dark ? 'text-paper' : 'text-ink'}`}>
+            {title}
+          </h2>
+        </Reveal>
+        {intro && (
+          <Reveal delay={120}>
+            <p className={`mt-5 max-w-2xl text-[1.0625rem] leading-relaxed u-pretty ${dark ? 'text-paper/65' : 'text-ink/65'}`}>
+              {intro}
+            </p>
+          </Reveal>
+        )}
+        {children && <Reveal delay={160}>{children}</Reveal>}
+      </div>
+    </div>
+  )
+}
+
+const BUTTON = {
+  primary: 'bg-flag text-white hover:bg-leaf',
+  secondary: 'border border-ink/20 bg-surface text-ink hover:border-ink/40',
+  light: 'bg-paper text-forest hover:bg-white',
+  outlineLight: 'border border-paper/25 text-paper hover:border-paper/60 hover:bg-paper/5',
+  dark: 'bg-ink text-paper hover:bg-forest',
+}
+
+/** Link styled as a button. Pass `icon={null}` to drop the trailing arrow. */
+export function Button({ href, children, variant = 'primary', icon: Icon = ArrowRight, className = '', ...rest }) {
+  return (
+    <a
+      href={href}
+      className={`group inline-flex items-center justify-center gap-2.5 rounded-md px-5 py-3 text-[0.9375rem] font-medium transition-colors duration-200 ${BUTTON[variant]} ${className}`}
+      {...rest}
+    >
+      {children}
+      {Icon && <Icon className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" strokeWidth={1.75} aria-hidden="true" />}
+    </a>
   )
 }

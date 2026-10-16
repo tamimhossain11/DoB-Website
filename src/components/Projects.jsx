@@ -1,102 +1,127 @@
 import { useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { Cpu, Mountain, RadioTower, Ship, Waves } from 'lucide-react'
 import { projects } from '../data/content'
-import { Kicker, Reveal, Section } from './ui'
+import { EASE, Reveal, Section, SectionHeader } from './ui'
+
+const ICONS = { 'DOB-R1': Mountain, 'DOB-A1': Waves, 'DOB-S1': Ship, 'DOB-X': RadioTower }
+export const programmeIcon = (code) => ICONS[code] ?? Cpu
 
 export default function Projects() {
-  const [open, setOpen] = useState(0)
+  const [index, setIndex] = useState(0)
+  const p = projects[index]
+  const Icon = programmeIcon(p.code)
+
+  function onKeyDown(e) {
+    const step = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key]
+    if (!step) return
+    e.preventDefault()
+    const next = (index + step + projects.length) % projects.length
+    setIndex(next)
+    document.getElementById(`programme-tab-${next}`)?.focus()
+  }
 
   return (
-    <Section id="projects" tone="parchment">
-      <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-        <Reveal className="max-w-2xl">
-          <Kicker>The machines</Kicker>
-          <h2 className="mt-6 font-display text-[clamp(2rem,4.2vw,3.25rem)] font-light leading-[1.05] tracking-[-0.03em] text-ink u-balance">
-            Four programmes, one{' '}
-            <span className="italic font-normal text-flag">engineering standard</span>.
-          </h2>
-        </Reveal>
+    <Section id="projects" tone="paper">
+      <SectionHeader
+        index="02"
+        label="The machines"
+        title="Four programmes, one engineering standard."
+        intro="Land, surface and subsea. Each programme runs a full design cycle every season — requirements, review, build, test, compete."
+      />
 
-        <Reveal delay={120}>
-          <p className="max-w-sm text-sm leading-relaxed text-ink/55">
-            Land, surface and subsea. Each programme runs a full design cycle every season —
-            requirements, review, build, test, compete.
-          </p>
-        </Reveal>
-      </div>
-
-      {/* Accordion — one row per programme */}
-      <div className="mt-14 overflow-hidden rounded-3xl border border-ink/10 bg-paper">
-        {projects.map((p, i) => {
-          const isOpen = open === i
-          const accent = p.accent === 'crimson' ? 'text-vermilion' : 'text-flag'
-          const accentBg = p.accent === 'crimson' ? 'bg-vermilion' : 'bg-flag'
-
-          return (
-            <Reveal
-              key={p.code}
-              delay={i * 70}
-              className={`border-ink/10 ${i > 0 ? 'border-t' : ''}`}
-            >
+      <Reveal className="mt-16 grid overflow-hidden rounded-lg border border-ink/10 bg-surface lg:grid-cols-12">
+        {/* Programme list */}
+        <div
+          role="tablist"
+          aria-label="Programmes"
+          aria-orientation="vertical"
+          onKeyDown={onKeyDown}
+          className="scrollbar-none flex overflow-x-auto border-b border-ink/10 lg:col-span-4 lg:flex-col lg:overflow-visible lg:border-b-0 lg:border-r"
+        >
+          {projects.map((item, i) => {
+            const ItemIcon = programmeIcon(item.code)
+            const selected = i === index
+            return (
               <button
+                key={item.code}
+                id={`programme-tab-${i}`}
+                role="tab"
                 type="button"
-                onClick={() => setOpen(isOpen ? -1 : i)}
-                aria-expanded={isOpen}
-                className="group flex w-full items-center gap-5 px-6 py-7 text-left transition-colors duration-400 hover:bg-parchment/60 sm:gap-8 sm:px-10"
+                aria-selected={selected}
+                aria-controls="programme-panel"
+                tabIndex={selected ? 0 : -1}
+                onClick={() => setIndex(i)}
+                className={`relative flex shrink-0 items-center gap-4 px-5 py-4 text-left transition-colors duration-200 lg:px-6 lg:py-5 ${
+                  i > 0 ? 'lg:border-t lg:border-ink/10' : ''
+                } ${selected ? 'bg-paper' : 'hover:bg-paper/60'}`}
               >
-                <span className={`kicker shrink-0 ${accent} opacity-70`}>{p.code}</span>
-
-                <span className="min-w-0 flex-1">
-                  <span className="block font-display text-xl font-normal leading-tight text-ink transition-colors duration-300 group-hover:text-flag sm:text-2xl">
-                    {p.name}
+                {selected && (
+                  <motion.span
+                    layoutId="programme-indicator"
+                    className="absolute inset-x-0 bottom-0 h-0.5 bg-flag lg:inset-y-0 lg:left-0 lg:right-auto lg:h-auto lg:w-0.5"
+                    transition={{ duration: 0.45, ease: EASE }}
+                  />
+                )}
+                <ItemIcon className={`h-5 w-5 shrink-0 ${selected ? 'text-flag' : 'text-ink/40'}`} strokeWidth={1.5} aria-hidden="true" />
+                <span className="min-w-0">
+                  <span className="block font-mono text-[0.6875rem] text-ink/40">{item.code}</span>
+                  <span className={`mt-0.5 block whitespace-nowrap text-[0.9375rem] font-medium ${selected ? 'text-ink' : 'text-ink/65'}`}>
+                    {item.name}
                   </span>
-                  <span className="mt-1.5 block text-xs text-ink/45 sm:text-[0.8125rem]">
-                    {p.domain}
-                  </span>
-                </span>
-
-                <span
-                  className={`relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition-all duration-400 ${
-                    isOpen
-                      ? `${accentBg} border-transparent text-paper rotate-45`
-                      : 'border-ink/20 text-ink/50 group-hover:border-flag group-hover:text-flag'
-                  }`}
-                >
-                  <svg viewBox="0 0 14 14" className="h-3.5 w-3.5" aria-hidden="true">
-                    <path
-                      d="M7 1v12M1 7h12"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                  </svg>
                 </span>
               </button>
+            )
+          })}
+        </div>
 
-              <div
-                className="grid transition-all duration-600 ease-[cubic-bezier(0.22,1,0.36,1)]"
-                style={{ gridTemplateRows: isOpen ? '1fr' : '0fr' }}
-              >
-                <div className="overflow-hidden">
-                  <div className="grid gap-8 px-6 pb-10 sm:px-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-14">
-                    <p className="max-w-xl text-[1.0625rem] leading-[1.75] text-ink/70">
-                      {p.summary}
-                    </p>
+        {/* Spec sheet */}
+        <div id="programme-panel" role="tabpanel" aria-labelledby={`programme-tab-${index}`} className="relative min-h-[26rem] lg:col-span-8">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={p.code}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.35, ease: EASE }}
+              className="p-6 sm:p-10"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="label text-flag">{p.domain}</p>
+                <span className="inline-flex items-center gap-2 rounded-full border border-flag/25 px-3 py-1 text-xs text-flag">
+                  <span className="h-1.5 w-1.5 rounded-full bg-flag" aria-hidden="true" />
+                  {p.year}
+                </span>
+              </div>
 
-                    <dl className="grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-ink/10 bg-ink/10 sm:grid-cols-2">
-                      {p.specs.map(([k, v]) => (
-                        <div key={k} className="bg-paper px-5 py-4">
-                          <dt className="kicker text-ink/35">{k}</dt>
-                          <dd className="mt-1.5 text-sm leading-snug text-ink/80">{v}</dd>
-                        </div>
-                      ))}
-                    </dl>
-                  </div>
+              <div className="mt-6 flex items-start gap-5">
+                <span className="hidden h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-forest text-mint sm:flex">
+                  <Icon className="h-7 w-7" strokeWidth={1.25} aria-hidden="true" />
+                </span>
+                <div>
+                  <h3 className="font-display text-3xl leading-tight text-ink">{p.name}</h3>
+                  <p className="mt-4 max-w-2xl text-[1.0625rem] leading-[1.7] text-ink/70 u-pretty">{p.summary}</p>
                 </div>
               </div>
-            </Reveal>
-          )
-        })}
-      </div>
+
+              <dl className="mt-10 border-t border-ink/10">
+                {p.specs.map(([k, v], i) => (
+                  <motion.div
+                    key={k}
+                    className="grid grid-cols-[7rem_1fr] gap-4 border-b border-ink/10 py-3.5 sm:grid-cols-[9rem_1fr]"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3, delay: 0.08 + i * 0.05 }}
+                  >
+                    <dt className="label pt-0.5 text-ink/40">{k}</dt>
+                    <dd className="text-[0.9375rem] text-ink/85">{v}</dd>
+                  </motion.div>
+                ))}
+              </dl>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </Reveal>
     </Section>
   )
 }

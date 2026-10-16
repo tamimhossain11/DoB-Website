@@ -1,47 +1,48 @@
 import { useEffect, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { ArrowRight, Menu, Newspaper, UserRound, X } from 'lucide-react'
 import { nav, site } from '../data/content'
 import { pressRelease } from '../data/press'
+import { hasStoredSession, SIGN_IN_PATH } from '../lib/signin'
+import { EASE } from './ui'
 
 /**
  * `hrefBase` prefixes the in-page anchors so the same nav works on sub-pages:
- * '' on the home page (#mission), '/' on the press page (/#mission).
- * `solid` opts out of the transparent-over-hero state.
+ * '' on the home page (#mission), '/' elsewhere (/#mission).
+ * `page` marks the current sub-page ('press' | 'signin').
  */
-export default function Nav({ hrefBase = '', solid = false }) {
+export default function Nav({ hrefBase = '', page = '' }) {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState('')
+  const [signedIn] = useState(hasStoredSession)
 
   const onSubPage = hrefBase !== ''
-  const opaque = solid || scrolled
+  const accountLabel = signedIn ? 'Account' : 'Sign in'
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24)
+    const onScroll = () => setScrolled(window.scrollY > 8)
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Highlight the section currently in the middle of the viewport
+  // Highlight the section in the middle of the viewport (home page only)
   useEffect(() => {
     if (onSubPage) return
-    const ids = nav.map((n) => n.href.slice(1))
     const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) setActive(e.target.id)
-        })
-      },
+      // Clear the highlight when its section leaves the middle band (e.g. back at the hero)
+      (entries) =>
+        entries.forEach((e) => setActive((a) => (e.isIntersecting ? e.target.id : a === e.target.id ? '' : a))),
       { rootMargin: '-45% 0px -50% 0px' },
     )
-    ids.forEach((id) => {
-      const el = document.getElementById(id)
+    nav.forEach((n) => {
+      const el = document.getElementById(n.href.slice(1))
       if (el) io.observe(el)
     })
     return () => io.disconnect()
   }, [onSubPage])
 
-  // Lock body scroll while the mobile sheet is open
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : ''
     return () => {
@@ -52,64 +53,70 @@ export default function Nav({ hrefBase = '', solid = false }) {
   return (
     <>
       <header
-        className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-          opaque
-            ? 'border-b border-ink/8 bg-paper/85 backdrop-blur-xl'
-            : 'border-b border-transparent bg-transparent'
+        className={`fixed inset-x-0 top-0 z-50 transition-[background-color,border-color] duration-300 ${
+          scrolled || onSubPage || open ? 'border-b border-ink/10 bg-paper/95 backdrop-blur' : 'border-b border-transparent bg-transparent'
         }`}
       >
-        <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between gap-6 px-5 sm:px-8 lg:px-12">
-          <a
-            href={onSubPage ? '/' : '#top'}
-            className="group flex shrink-0 items-center gap-3"
-            aria-label={site.name}
-          >
-            <img
-              src="/logo-mark.png"
-              alt=""
-              className="h-11 w-auto transition-transform duration-500 group-hover:scale-[1.04] sm:h-12"
-            />
-            <span className="sr-only">{site.name}</span>
+        <div className="mx-auto flex h-[4.5rem] w-full max-w-7xl items-center justify-between gap-4 px-5 sm:px-8 xl:px-12">
+          <a href={onSubPage ? '/' : '#top'} className="flex shrink-0 items-center" aria-label={`${site.name} — home`}>
+            <img src="/logo-mark.png" alt="" className="h-9 w-auto sm:h-10" />
           </a>
 
-          <nav className="hidden items-center gap-1 lg:flex">
+          <nav className="hidden items-center lg:flex" aria-label="Main">
             {nav.map((item) => {
               const isActive = active === item.href.slice(1)
               return (
                 <a
                   key={item.href}
                   href={hrefBase + item.href}
-                  className={`relative whitespace-nowrap rounded-full px-3 py-2 text-sm transition-colors duration-300 xl:px-4 ${
-                    isActive ? 'text-flag' : 'text-ink/65 hover:text-ink'
+                  className={`relative px-3 py-2 text-[0.9rem] transition-colors duration-200 xl:px-3.5 ${
+                    isActive ? 'text-ink' : 'text-ink/60 hover:text-ink'
                   }`}
                 >
                   {item.label}
-                  <span
-                    className={`absolute inset-x-3 -bottom-0.5 h-px origin-left bg-flag transition-transform duration-300 xl:inset-x-4 ${
-                      isActive ? 'scale-x-100' : 'scale-x-0'
-                    }`}
-                  />
+                  {isActive && (
+                    <motion.span
+                      layoutId="nav-active"
+                      className="absolute inset-x-3 -bottom-[1.05rem] h-0.5 bg-flag xl:inset-x-3.5"
+                      transition={{ duration: 0.4, ease: EASE }}
+                    />
+                  )}
                 </a>
               )
             })}
-
+            <span className="mx-2 h-4 w-px bg-ink/15" aria-hidden="true" />
             <a
               href={`/${pressRelease.slug}`}
-              aria-current={onSubPage ? 'page' : undefined}
-              className={`relative ml-1 whitespace-nowrap rounded-full border px-3.5 py-2 text-sm transition-colors duration-300 xl:px-4 ${
-                onSubPage
-                  ? 'border-flag/40 bg-flag/8 text-flag'
-                  : 'border-ink/12 text-ink/65 hover:border-flag/40 hover:text-flag'
+              aria-current={page === 'press' ? 'page' : undefined}
+              className={`inline-flex items-center gap-2 px-3 py-2 text-[0.9rem] transition-colors duration-200 ${
+                page === 'press' ? 'text-flag' : 'text-ink/60 hover:text-ink'
               }`}
             >
-              {pressRelease.label}
+              <Newspaper className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
+              Press
             </a>
           </nav>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            {/* Icon-only between lg and xl, where the link row leaves no room for text */}
+            <a
+              href={SIGN_IN_PATH}
+              aria-current={page === 'signin' ? 'page' : undefined}
+              aria-label={accountLabel}
+              title={accountLabel}
+              className={`hidden items-center gap-2 rounded-md border px-3.5 py-2 text-[0.9rem] transition-colors duration-200 sm:inline-flex lg:px-2.5 xl:px-3.5 ${
+                page === 'signin'
+                  ? 'border-flag/40 bg-flag/5 text-flag'
+                  : 'border-ink/15 text-ink/75 hover:border-ink/35 hover:text-ink'
+              }`}
+            >
+              <UserRound className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden="true" />
+              <span className="lg:hidden xl:inline">{accountLabel}</span>
+            </a>
+
             <a
               href={`${hrefBase}#join`}
-              className="hidden whitespace-nowrap rounded-full bg-flag px-5 py-2.5 text-sm font-medium text-paper shadow-[0_8px_24px_-12px_rgba(0,106,78,0.8)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-leaf sm:inline-block"
+              className="hidden items-center gap-2 whitespace-nowrap rounded-md bg-flag px-4 py-2 text-[0.9rem] font-medium text-white transition-colors duration-200 hover:bg-leaf sm:inline-flex"
             >
               Join the team
             </a>
@@ -118,82 +125,79 @@ export default function Nav({ hrefBase = '', solid = false }) {
               type="button"
               onClick={() => setOpen((v) => !v)}
               aria-expanded={open}
+              aria-controls="mobile-menu"
               aria-label={open ? 'Close menu' : 'Open menu'}
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-ink/15 text-ink transition-colors hover:border-flag hover:text-flag lg:hidden"
+              className="flex h-10 w-10 items-center justify-center rounded-md border border-ink/15 text-ink transition-colors hover:border-ink/35 lg:hidden"
             >
-              <span className="relative block h-3 w-5">
-                <span
-                  className={`absolute left-0 block h-px w-5 bg-current transition-all duration-300 ${
-                    open ? 'top-1.5 rotate-45' : 'top-0'
-                  }`}
-                />
-                <span
-                  className={`absolute left-0 top-1.5 block h-px w-5 bg-current transition-all duration-300 ${
-                    open ? 'opacity-0' : 'opacity-100'
-                  }`}
-                />
-                <span
-                  className={`absolute left-0 block h-px w-5 bg-current transition-all duration-300 ${
-                    open ? 'top-1.5 -rotate-45' : 'top-3'
-                  }`}
-                />
-              </span>
+              {open ? <X className="h-5 w-5" strokeWidth={1.75} /> : <Menu className="h-5 w-5" strokeWidth={1.75} />}
             </button>
           </div>
         </div>
       </header>
 
-      {/* Mobile sheet */}
-      <div
-        className={`fixed inset-0 z-40 lg:hidden ${open ? 'pointer-events-auto' : 'pointer-events-none'}`}
-        aria-hidden={!open}
-      >
-        <div
-          onClick={() => setOpen(false)}
-          className={`absolute inset-0 bg-ink/40 backdrop-blur-sm transition-opacity duration-400 ${
-            open ? 'opacity-100' : 'opacity-0'
-          }`}
-        />
-        <nav
-          className={`absolute inset-x-0 top-0 origin-top bg-paper px-5 pb-10 pt-24 transition-all duration-500 sm:px-8 ${
-            open ? 'translate-y-0 opacity-100' : '-translate-y-6 opacity-0'
-          }`}
-        >
-          <ul className="flex flex-col">
-            {nav.map((item, i) => (
-              <li key={item.href} className="border-b border-ink/8">
-                <a
-                  href={hrefBase + item.href}
-                  onClick={() => setOpen(false)}
-                  className="flex items-baseline gap-4 py-4 font-display text-3xl font-light text-ink transition-colors hover:text-flag"
-                >
-                  <span className="kicker text-flag/50">{String(i + 1).padStart(2, '0')}</span>
-                  {item.label}
-                </a>
-              </li>
-            ))}
-            <li className="border-b border-ink/8">
-              <a
-                href={`/${pressRelease.slug}`}
-                onClick={() => setOpen(false)}
-                className="flex items-baseline gap-4 py-4 font-display text-2xl font-light text-flag transition-colors hover:text-leaf"
-              >
-                <span className="kicker text-flag/50">
-                  {String(nav.length + 1).padStart(2, '0')}
-                </span>
-                {pressRelease.label}
-              </a>
-            </li>
-          </ul>
-          <a
-            href={`${hrefBase}#join`}
-            onClick={() => setOpen(false)}
-            className="mt-8 block rounded-full bg-flag px-6 py-4 text-center text-sm font-medium text-paper"
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            id="mobile-menu"
+            className="fixed inset-0 z-40 flex flex-col bg-paper pt-[4.5rem] lg:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
           >
-            Join the team
-          </a>
-        </nav>
-      </div>
+            <motion.nav
+              className="flex flex-1 flex-col overflow-y-auto px-5 pb-8 pt-4 sm:px-8"
+              aria-label="Mobile"
+              initial="hidden"
+              animate="show"
+              variants={{ show: { transition: { staggerChildren: 0.04, delayChildren: 0.05 } } }}
+            >
+              <ul>
+                {[...nav, { label: pressRelease.label, href: `/${pressRelease.slug}`, absolute: true }].map((item, i) => (
+                  <motion.li
+                    key={item.href}
+                    variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: EASE } } }}
+                    className="border-b border-ink/10"
+                  >
+                    <a
+                      href={item.absolute ? item.href : hrefBase + item.href}
+                      onClick={() => setOpen(false)}
+                      className="flex items-center justify-between py-4 font-display text-2xl text-ink"
+                    >
+                      <span className="flex items-baseline gap-4">
+                        <span className="label tabular text-ink/35">{String(i + 1).padStart(2, '0')}</span>
+                        {item.label}
+                      </span>
+                      <ArrowRight className="h-5 w-5 text-ink/30" strokeWidth={1.5} aria-hidden="true" />
+                    </a>
+                  </motion.li>
+                ))}
+              </ul>
+
+              <motion.div
+                variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { duration: 0.4 } } }}
+                className="mt-auto grid gap-3 pt-8"
+              >
+                <a
+                  href={`${hrefBase}#join`}
+                  onClick={() => setOpen(false)}
+                  className="rounded-md bg-flag px-6 py-3.5 text-center text-[0.9375rem] font-medium text-white"
+                >
+                  Join the team
+                </a>
+                <a
+                  href={SIGN_IN_PATH}
+                  onClick={() => setOpen(false)}
+                  className="flex items-center justify-center gap-2 rounded-md border border-ink/20 px-6 py-3.5 text-[0.9375rem] font-medium text-ink"
+                >
+                  <UserRound className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
+                  {signedIn ? 'Account' : 'Member sign in'}
+                </a>
+              </motion.div>
+            </motion.nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   )
 }
