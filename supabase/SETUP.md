@@ -30,6 +30,8 @@ running it again will fail because the tables already exist.
    Then run [`migrations/20261017000000_task_assignees.sql`](migrations/20261017000000_task_assignees.sql)
    — it lets one task have **several assignees**. Existing tasks keep their assignee,
    status and history.
+   Then run [`migrations/20261018000000_designer_role_and_uploads.sql`](migrations/20261018000000_designer_role_and_uploads.sql)
+   — it adds the **Creative Designer** role and raises attachments to **50 MB** per file.
 5. *(Recommended)* **Database → Extensions →** enable **pg_cron**, then run
    [`cron.sql`](cron.sql) in the SQL Editor. Overdue tasks are then locked — and the
    assignee, creator and admins notified — within 5 minutes of the deadline even when
@@ -113,7 +115,7 @@ time, so a deploy made before they were added won't pick them up.
 
 ## Checklist
 
-- [ ] All three migrations ran without errors, in order (proposal board → tasks → task assignees)
+- [ ] All four migrations ran without errors, in order (proposal board → tasks → task assignees → designer role & uploads)
 - [ ] *(Recommended)* pg_cron enabled and `cron.sql` run
 - [ ] Sign-ups disabled; Site URL and Redirect URLs set
 - [ ] Five logins created, five rows from `members.sql`

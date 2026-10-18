@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowLeft, CircleAlert, Lock, Save, Send } from 'lucide-react'
-import { requisitionTypes } from '../../data/board'
+import { attachmentRules, requisitionTypes } from '../../data/board'
 import { actions } from '../../board/store'
 import { currentVersion, isLocked, roleOf, typeById } from '../../board/workflow'
 import { AttachButton, AttachmentList } from './Attachments'
@@ -151,7 +151,7 @@ export default function ProposalForm({ me, mode, proposal, onDone, onCancel }) {
           </Section>
         )}
 
-        <Section step={nextStep()} title="Attachments" hint="Text, PDF and image files, up to 10 MB each.">
+        <Section step={nextStep()} title="Attachments" hint={`Text, PDF and image files, up to ${attachmentRules.maxLabel} each.`}>
           <div className="space-y-3">
             <AttachmentList files={fields.attachments} onRemove={(id) => setFields((f) => ({ ...f, attachments: f.attachments.filter((a) => a.id !== id) }))} />
             <AttachButton onAdd={(added) => setFields((f) => ({ ...f, attachments: [...f.attachments, ...added] }))} />

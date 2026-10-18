@@ -17,7 +17,7 @@ export function AttachButton({ onAdd, label = 'Attach file', compact = false, cl
     const bad = files.find((f) => !attachmentRules.allowed(f.type, f.name))
     if (bad) return setError(`${bad.name}: only text, PDF and image files can be attached.`)
     const big = files.find((f) => f.size > attachmentRules.maxBytes)
-    if (big) return setError(`${big.name} is over ${formatBytes(attachmentRules.maxBytes)}.`)
+    if (big) return setError(`${big.name} is over the ${attachmentRules.maxLabel} limit.`)
     setBusy(true)
     try {
       onAdd(await Promise.all(files.map(saveFile)))

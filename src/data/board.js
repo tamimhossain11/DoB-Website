@@ -11,17 +11,21 @@ export const board = {
 }
 
 /**
- * Phase 1 roles. Every role sees every module and every proposal; each approval is
+ * Board roles. Every role sees every module and every proposal; each approval is
  * recorded against the individual role and person, never pooled into a vote count.
  * Names are filled in at runtime from the board_members table in Supabase
  * (see supabase/members.sql); the role title is shown when a name is empty.
+ *
+ * `abbr` is the short badge text; `handle` is what follows @ in a mention.
+ * Adding a role also needs board_role_ids() / board_role_label() in the database.
  */
 export const members = [
-  { id: 'president', role: 'President', name: '' },
-  { id: 'ceo', role: 'CEO', name: '' },
-  { id: 'cto', role: 'CTO', name: '' },
-  { id: 'cio', role: 'CIO', name: '' },
-  { id: 'cfo', role: 'CFO', name: '' },
+  { id: 'president', role: 'President', abbr: 'PRS', handle: 'President', name: '' },
+  { id: 'ceo', role: 'CEO', abbr: 'CEO', handle: 'CEO', name: '' },
+  { id: 'cto', role: 'CTO', abbr: 'CTO', handle: 'CTO', name: '' },
+  { id: 'cio', role: 'CIO', abbr: 'CIO', handle: 'CIO', name: '' },
+  { id: 'cfo', role: 'CFO', abbr: 'CFO', handle: 'CFO', name: '' },
+  { id: 'designer', role: 'Creative Designer', abbr: 'DES', handle: 'Designer', name: '' },
 ]
 
 /**
@@ -65,10 +69,11 @@ export const requisitionTypes = [
   },
 ]
 
-/** Attachments: text, PDF and images only, up to 10 MB (the storage bucket enforces the same). */
+/** Attachments: text, PDF and images only, up to 50 MB each (the storage bucket enforces the same). */
 export const attachmentRules = {
   accept: 'text/*,.txt,.md,.csv,application/pdf,image/*',
-  maxBytes: 10 * 1024 * 1024,
+  maxBytes: 50 * 1024 * 1024,
+  maxLabel: '50 MB',
   allowed: (mime, name) =>
     mime.startsWith('text/') ||
     mime.startsWith('image/') ||

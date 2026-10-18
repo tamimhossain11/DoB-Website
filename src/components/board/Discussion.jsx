@@ -220,7 +220,7 @@ function Composer({ me, target, parentId = null, correctsId = null, onDone, comp
   const canSend = (body.trim() || files.length || meeting) && meetingValid && !busy
 
   function mention(m) {
-    const tag = `@${m.role} `
+    const tag = `@${m.handle ?? m.role} `
     setBody((b) => (b && !b.endsWith(' ') ? `${b} ${tag}` : b + tag))
     setMentionOpen(false)
     box.current?.focus()
@@ -400,7 +400,7 @@ function usePageVisible() {
 }
 
 function highlightMentions(text) {
-  const roles = members.map((m) => m.role).join('|')
+  const roles = members.map((m) => m.handle ?? m.role).join('|')
   const parts = text.split(new RegExp(`(@(?:${roles})\\b)`, 'gi'))
   return parts.map((part, i) => (i % 2 ? <span key={i} className="rounded bg-flag/10 px-1 font-medium text-flag">{part}</span> : part))
 }

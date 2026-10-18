@@ -50,7 +50,7 @@ export function RoleBadge({ id, size = 'md', className = '' }) {
         lead ? 'bg-forest text-mint' : 'bg-parchment text-flag'
       } ${sizes[size]} ${className}`}
     >
-      {m?.role === 'President' ? 'PRS' : (m?.role ?? '?')}
+      {m?.abbr ?? m?.role ?? '?'}
     </span>
   )
 }

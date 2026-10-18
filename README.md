@@ -164,8 +164,10 @@ supabase/
   migrations/…_proposal_board.sql   schema, workflow functions, security, storage, realtime
   migrations/…_board_tasks.sql      tasks: assignment, due dates, overdue lock, task threads
   migrations/…_task_assignees.sql   several assignees per task, each submits and is reviewed separately
+  migrations/…_designer_role_and_uploads.sql   Creative Designer role; 50 MB attachments
+  members.sql             who holds which role (re-runnable; hands roles over safely)
+  reset-test-data.sql     one-off: delete all proposals and tasks before going live
   cron.sql                optional: run the overdue-task sweep every 5 minutes
-  members.sql             add / update board members
 ```
 
 If you change a workflow rule, change it in both the SQL functions and

@@ -103,7 +103,7 @@ export const needsActionFrom = (p, me) =>
 export function parseMentions(text) {
   const found = new Set()
   for (const m of members) {
-    const re = new RegExp(`(^|[^\\w])@${m.role}\\b`, 'i')
+    const re = new RegExp(`(^|[^\\w])@${m.handle ?? m.role}\\b`, 'i')
     if (re.test(text)) found.add(m.id)
   }
   return [...found]
